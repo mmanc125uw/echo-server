@@ -4,6 +4,42 @@ import traceback
 
 
 def client(msg, log_buffer=sys.stderr):
+
+    msg_block_size = 16
+    server_host = "127.0.0.1"
+    server_port = 8000
+    server_address = (server_host, server_port)
+
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+    print('connecting to {0} port {1}'.format(*server_address), file=log_buffer)
+    client_socket.connect((server_host, server_port))
+    received_message = ""
+    try:
+        print('sending "{0}"'.format(msg), file=log_buffer)
+        client_socket.sendall(msg.encode('utf-8'))
+        print('waiting server reply')
+        while True:
+            msg_chunk = client_socket.recv(msg_block_size)
+            received_message += msg_chunk.decode()
+            #print(received_message)
+            #print(str(len(received_message)))
+            if (len(received_message) >= len(msg)):
+                #print("done msg rcvd")
+                break
+
+        print("Server says: {}".format(received_message))
+        
+    except Exception as e:
+        traceback.print_exc()
+        sys.exit(1)
+    finally:
+        print('closing socket', file=log_buffer)
+        client_socket.close()
+
+    return(received_message)
+    
+    
+def client_WhatToDo(msg, log_buffer=sys.stderr):
     server_address = ('localhost', 10000)
     # TODO: Replace the following line with your code which will instantiate
     #       a TCP socket with IPv4 Addressing, call the socket you make 'sock'

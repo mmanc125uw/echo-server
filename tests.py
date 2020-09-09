@@ -23,6 +23,7 @@ class EchoTestCase(unittest.TestCase):
 
     def test_short_message_echo(self):
         """test that a message short than 16 bytes echoes cleanly"""
+        print('\n')
         expected = "short message"
         actual = self.send_message(expected)
         self.assertEqual(
@@ -33,6 +34,7 @@ class EchoTestCase(unittest.TestCase):
 
     def test_long_message_echo(self):
         """test that a message longer than 16 bytes echoes in 16-byte chunks"""
+        print('\n')
         expected = "Four score and seven years ago our fathers did stuff"
         actual = self.send_message(expected)
         self.assertEqual(

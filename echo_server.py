@@ -4,6 +4,55 @@ import traceback
 
 
 def server(log_buffer=sys.stderr):
+
+    msg_block_size = 16
+    server_host = "127.0.0.1"
+    server_port = 8000
+    server_address = (server_host, server_port)
+    print("making a server on {0}:{1}".format(*server_address), file=log_buffer)
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+    server_socket.bind(server_address)
+
+    try:
+        # the outer loop controls the creation of new connection sockets. The
+        # server will handle each incoming connection one at a time.
+        while True:
+            print('waiting for a connection', file=log_buffer)
+            server_socket.listen(1)
+            connection, client_address = server_socket.accept()
+            print('connection accepted - {0}:{1}'.format(*client_address), file=log_buffer)
+    
+            print('waiting too recv msg')
+            totmsg = ""
+            while True:
+                received_message = connection.recv(msg_block_size)
+                #print('rcvd len is ' + str(len(received_message)))
+                #print("rcvd msg block: {}".format(received_message.decode()))
+
+                totmsg += format(received_message.decode())
+
+                if (len(received_message) < msg_block_size):
+                    #print('done breaking out of inner loop')
+                    print("Client says: {}".format(totmsg))
+                    connection.sendall(totmsg.encode('utf8'))
+                    
+                    break
+                
+            connection.shutdown(socket.SHUT_RDWR)
+            connection.close()
+            
+                
+    except Exception as e:
+        traceback.print_exc()
+        sys.exit(1)
+    finally:
+        print(
+            'echo complete, client connection closed', file=log_buffer
+        )
+        server_socket.close()
+
+
+def server_WhatToDo(log_buffer=sys.stderr):
     # set an address for our server
     address = ('127.0.0.1', 10000)
     # TODO: Replace the following line with your code which will instantiate
